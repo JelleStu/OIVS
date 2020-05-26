@@ -1,0 +1,61 @@
+﻿@inject CategoriesModel categorieModel
+
+@using OnlineInventorySystem.Data
+
+
+@model IEnumerable<OnlineInventorySystem.Data.Productview>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2 style="text-align: center"> Products inventory</h2>
+<div id="CatagoryFilterButtons">
+    <p>Filter op categorie.</p>
+    <a asp-action="Products">Geen filter | </a>
+
+    @{
+        List<Productview> kankerlijst = new List<Productview>();
+        for (
+            int i = 0; i < CategoriesModel.productcategories.Count(); i++)
+        {
+            <a asp-action="Products" asp-route-category="@CategoriesModel.productcategories[i]"> @CategoriesModel.productcategories[i] | </a>
+        }
+    }
+
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(product => product.productName)</th>
+            <th>@Html.DisplayNameFor(product => product.productDescription)</th>
+            <th>@Html.DisplayNameFor(product => product.productCategory)</th>
+            <th>@Html.DisplayNameFor(product => product.productPrice)</th>
+            <th>@Html.DisplayNameFor(product => product.quantity)</th>
+            <th>
+                <p style="margin-left: 46%;margin-top: 0;margin-right: 0;margin-bottom: 0;">
+                    <a asp-action="Create">
+                        <img src="/img/plus.png" alt="Add product" style="height: 20px;">
+                    </a>
+                </p>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.productName</td>
+                <td>@product.productDescription</td>
+                <td>@product.productCategory</td>
+                <td>€@product.productPrice</td>
+                <td>@product.quantity</td>
+                <td style="text-align: center">
+                    <a asp-action="Edit" asp-route-id="@product.productId">Edit</a> |
+                    <a asp-action="DetailProduct" asp-route-id="@product.productId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@product.productId">Delete</a>
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>

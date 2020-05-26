@@ -1,0 +1,32 @@
+﻿@model OnlineInventorySystem.Data.InlogFormData
+
+@{
+    ViewData["Title"] = "Login page";
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="author" content="SitePoint">
+    <link href="css/stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+    <div style="text-align: center;">
+        <h1 style="margin-top: 45px">Login page</h1>
+        <div style="margin-top: 50px;">
+            @using (Html.BeginForm("LoginForm", "Form", FormMethod.Post))
+            {
+                @Html.TextBoxFor(m => m.UsernameTextboxData)
+                <br/>
+                <br/>
+                @Html.PasswordFor(m => m.PasswordTextboxData)
+                <br/>
+                <input type="submit" value="Login"/>
+            }
+        </div>
+    </div>
+
+</body>
+</html>
