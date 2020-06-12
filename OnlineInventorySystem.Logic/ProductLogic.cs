@@ -16,6 +16,8 @@ namespace OnlineInventorySystem.Logic
         public int quantity { get; set; }
 
         public decimal productPrice { get; set; }
-        public int companyID { get; set; }
+        
+        public Company company { get; set; }
+
     }
 }

@@ -13,7 +13,7 @@ namespace OnlineInventorySystem.Controllers
     {
         private const string SessionKeyCompany = "_CompanyID";
         private FormLogic formlogic = new FormLogic();
-        private CompanyManagerLogic companyMangerLogic = new CompanyManagerLogic();
+        private CompanyManager companyManger = new CompanyManager();
 
         [HttpPost]
         public IActionResult LoginForm(InlogFormData inlogFormData)
@@ -21,7 +21,7 @@ namespace OnlineInventorySystem.Controllers
          bool empty = formlogic.NullCheck(inlogFormData.UsernameTextboxData, inlogFormData.PasswordTextboxData);
           if (empty == false)
           {
-           int id = companyMangerLogic.CompanyLogin(inlogFormData.UsernameTextboxData, inlogFormData.PasswordTextboxData);
+           int id = companyManger.CompanyLogin(inlogFormData.UsernameTextboxData, inlogFormData.PasswordTextboxData);
             if (id != 0)
             {
                 SetSession(id);

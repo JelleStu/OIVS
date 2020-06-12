@@ -14,8 +14,17 @@ namespace OnlineInventorySystem.Controllers
 {
     public class ProductController : Controller
     {
-        private ProductManagerView productManagerView = new ProductManagerView();
+        private ProductManagerView productManagerView;
+        private CompanyManager companyManager;
+        private Company company;
         private int CompanyID;
+
+        public ProductController()
+        {
+            companyManager = new CompanyManager();
+            company = companyManager.GetCompanyByID(CompanyID);
+            productManagerView = new ProductManagerView(company);
+        }
 
         public IActionResult Products(string category)
         {
@@ -27,13 +36,13 @@ namespace OnlineInventorySystem.Controllers
                     List<Productview> products = productManagerView.GetAllProducts(CompanyID);
                     CategoriesModel categories = new CategoriesModel();
                     categories.SetList(products);
-                    productManagerView.GetSession(CompanyID);
+                   // productManagerView.GetSession(CompanyID);
                     return View(products);
                 }
                 else
                 {
                     List<Productview> products = productManagerView.GetCategoryProduct(category, CompanyID);
-                    productManagerView.GetSession(CompanyID);
+                    //productManagerView.GetSession(CompanyID);
                     return View(products);
                 }
             }

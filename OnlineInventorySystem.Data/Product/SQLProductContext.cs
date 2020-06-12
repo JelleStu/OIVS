@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Security.Claims;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using OnlineInventorySystem.Data.Product;
 
 namespace OnlineInventorySystem.Data
 {
-    public class ProductDatabaseManager
+    public class SQLProductContext : IProductContext<ProductDto>
     {
-        private DatabaseClass dbClass = new DatabaseClass();
-
-        public List<ProductDto> GetAllProducts(int companyID)
+        private readonly string connectionString =
+            "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=OnlineInventorySystem;";
+        public List<ProductDto> GetProducts(int companyID)
         {
             List<ProductDto> products = new List<ProductDto>();
 
-            using (SqlConnection connection = new SqlConnection(dbClass.dbconnection))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand query = new SqlCommand("select * FROM products WHERE companyID = @companyID", connection))
                 {
@@ -37,19 +40,18 @@ namespace OnlineInventorySystem.Data
                     connection.Close();
                     return products;
                 }
-                
-            }
 
+            }
         }
 
-        public ProductDto GetProductById(int id)
+        public ProductDto GetProductByID(int productID)
         {
             ProductDto product = null;
-            using (SqlConnection connection = new SqlConnection(dbClass.dbconnection))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand query = new SqlCommand("select * from products where productID = @productID", connection))
                 {
-                    query.Parameters.AddWithValue("@productID", id);
+                    query.Parameters.AddWithValue("@productID", productID);
                     connection.Open();
                     var reader = query.ExecuteReader();
                     while (reader.Read())
@@ -72,29 +74,9 @@ namespace OnlineInventorySystem.Data
             }
         }
 
-        public void EditProduct(int _id, string _name, string _description, int _quantity, decimal _price)
+        public void InsertProduct(string _name, string _description, int _quantity, decimal _price, int companyID, string productCategory)
         {
-            using (SqlConnection connection = new SqlConnection(dbClass.dbconnection))
-            {
-                using (SqlCommand query = new SqlCommand("UPDATE products SET productName = @name, productDescription = @description, quantity = @quantity, productPrice = @price WHERE productID = @id", connection))
-                {
-                    query.Parameters.AddWithValue("@name", _name);
-                    query.Parameters.AddWithValue("@description", _description);
-                    query.Parameters.AddWithValue("@quantity", _quantity);
-                    query.Parameters.AddWithValue("@price", _price);
-                    query.Parameters.AddWithValue("@id", _id);
-
-                    connection.Open();
-                    query.ExecuteNonQuery();
-                    connection.Close();
-                }
-            }
-        }
-
-        public void CreateProduct(string _name, string _description, int _quantity, decimal _price, int companyID, string productCategory)
-        {
-
-            using (SqlConnection connection = new SqlConnection(dbClass.dbconnection))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand query = new SqlCommand("INSERT INTO products(productName, productDescription, quantity, productPrice, companyID, category) VALUES (@name, @description, @quantity, @price, @companyID, @category)", connection))
                 {
@@ -112,13 +94,33 @@ namespace OnlineInventorySystem.Data
             }
         }
 
-        public void DeleteProduct(int id)
+        public void DeleteProduct(int productID)
         {
-            using (SqlConnection connection = new SqlConnection(dbClass.dbconnection))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand query = new SqlCommand("DELETE FROM products WHERE productID = @id", connection))
                 {
-                    query.Parameters.AddWithValue("@id", id);
+                    query.Parameters.AddWithValue("@id", productID);
+
+                    connection.Open();
+                    query.ExecuteNonQuery();
+                    connection.Close();
+                }
+            }
+        }
+
+        public void UpdateProduct(int productid, string productname, string productdescription, int quantity,
+            decimal price)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand query = new SqlCommand("UPDATE products SET productName = @name, productDescription = @description, quantity = @quantity, productPrice = @price WHERE productID = @id", connection))
+                {
+                    query.Parameters.AddWithValue("@id", productid);
+                    query.Parameters.AddWithValue("@name", productname);
+                    query.Parameters.AddWithValue("@description", productdescription);
+                    query.Parameters.AddWithValue("@quantity", quantity);
+                    query.Parameters.AddWithValue("@price", price);
                     
                     connection.Open();
                     query.ExecuteNonQuery();
@@ -127,9 +129,9 @@ namespace OnlineInventorySystem.Data
             }
         }
 
-        public List<ProductDto> GetProductsCategory(string category, int companyID)
+        public List<ProductDto> GetProductsByCategory(string category, int companyID)
         {
-            using (SqlConnection connection = new SqlConnection(dbClass.dbconnection))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand query =
                     new SqlCommand("SELECT * FROM products WHERE companyID = @companyID AND category = @category",
@@ -137,7 +139,7 @@ namespace OnlineInventorySystem.Data
                 {
                     query.Parameters.AddWithValue("@companyID", companyID);
                     query.Parameters.AddWithValue("@category", category);
-                    
+
                     connection.Open();
 
                     List<ProductDto> productsCategorized = new List<ProductDto>();

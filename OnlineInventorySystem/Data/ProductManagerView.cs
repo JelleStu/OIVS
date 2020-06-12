@@ -8,12 +8,13 @@ namespace OnlineInventorySystem.Data
 {
     public class ProductManagerView
     {
-        private ProductManagerLogic productManagerLogic;
-        private int companyID;
+        private ProductManager productManagerLogic;
+        private Logic.Company company;
 
-        public ProductManagerView()
+        public ProductManagerView(Logic.Company _company)
         {
-            productManagerLogic = new ProductManagerLogic();
+            company = _company;
+            productManagerLogic = new ProductManager(company);
         }
         public List<Productview> GetAllProducts(int companyID)
         {
@@ -33,7 +34,8 @@ namespace OnlineInventorySystem.Data
                 productName = productLogic.productName,
                 productDescription = productLogic.productDescription,
                 quantity = productLogic.quantity,
-                productPrice = productLogic.productPrice
+                productPrice = productLogic.productPrice,
+                productCategory = productLogic.productCategory
             };
 
             return productView;
@@ -62,11 +64,6 @@ namespace OnlineInventorySystem.Data
             return ConvertToProductview(productLogics);
         }
 
-        public void GetSession(int id)
-        {
-           companyID = id;
-        }
-
         private List<Productview> ConvertToProductview(List<ProductLogic> productsLogic)
         {
             List<Productview> productsView = new List<Productview>();
@@ -79,7 +76,7 @@ namespace OnlineInventorySystem.Data
                     productDescription = productLogic.productDescription,
                     quantity = productLogic.quantity,
                     productPrice = productLogic.productPrice,
-                    companyID = productLogic.companyID,
+                    companyID = company.companyID,
                     productCategory = productLogic.productCategory
                 };
                 productsView.Add(productview);

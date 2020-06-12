@@ -1,26 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using OnlineInventorySystem.Data;
+using OnlineInventorySystem.Data.Product;
 
 namespace OnlineInventorySystem.Logic
 {
-    public class ProductManagerLogic
+    public class ProductManager
     {
-        private readonly ProductDatabaseManager productDatabaseManager;
+        private ProductRepository productRepository;
+        private SQLProductContext sqlProductContext;
+        private Company company;
 
-        public ProductManagerLogic()
+        public ProductManager(Company _copmany)
         {
-             productDatabaseManager = new ProductDatabaseManager();
+            company = _copmany;
+            sqlProductContext = new SQLProductContext();
+            productRepository = new ProductRepository(sqlProductContext);
+        }
+        public ProductManager(Company _copmany, IProductContext<ProductDto> context)
+        {
+            company = _copmany;
+            productRepository = new ProductRepository(context);
         }
         public List<ProductLogic> GetAllProducts(int companyID)
         {
-            List<ProductDto> productsDTO = productDatabaseManager.GetAllProducts(companyID);
+           List<ProductDto> productsDTO = productRepository.GetProducts(companyID);
             return ConvertToProductLogic(productsDTO);
         }
 
         public ProductLogic GetProductById(int id)
         {
-            ProductDto productDTO = productDatabaseManager.GetProductById(id);
+            ProductDto productDTO = productRepository.GetProductByID(id);
             if (productDTO == null) return null;
             ProductLogic productLogic = new ProductLogic
             {
@@ -28,7 +38,9 @@ namespace OnlineInventorySystem.Logic
                 productName = productDTO.productName,
                 productDescription = productDTO.productDescription,
                 quantity = productDTO.quantity,
-                productPrice = productDTO.productPrice
+                productPrice = productDTO.productPrice,
+                company = company,
+                productCategory = productDTO.productCategory
             };
             return productLogic;
             }
@@ -36,22 +48,22 @@ namespace OnlineInventorySystem.Logic
         public void EditProduct(int productid, string productname, string productdescription, int quantity,
             decimal price)
         {
-            productDatabaseManager.EditProduct(productid, productname, productdescription, quantity, price);
+            productRepository.UpdateProduct(productid, productname, productdescription, quantity, price);
         }
 
         public void CreateProduct(string productname, string productdescription,int quantity, decimal price, int companyID, string productCategory)
         {
-            productDatabaseManager.CreateProduct(productname, productdescription, quantity, price, companyID, productCategory);
+            productRepository.InsertProduct(productname, productdescription, quantity, price, companyID, productCategory);
         }
 
         public void DeleteProduct(int id)
         {
-            productDatabaseManager.DeleteProduct(id);
+            productRepository.DeleteProduct(id);
         }
 
         public List<ProductLogic> GetCategoryProduct(string category, int companyID)
         {
-           var productsDTO = productDatabaseManager.GetProductsCategory(category, companyID);
+           var productsDTO = productRepository.GetProductsByCategory(category, companyID);
            return ConvertToProductLogic(productsDTO);
 
         }
@@ -67,7 +79,7 @@ namespace OnlineInventorySystem.Logic
                 productLogic.productDescription = productDTO.productDescription;
                 productLogic.quantity = productDTO.quantity;
                 productLogic.productPrice = productDTO.productPrice;
-                productLogic.companyID = productDTO.companyID;
+                productLogic.company = company;
                 productLogic.productCategory = productDTO.productCategory;
                 productsLogic.Add(productLogic);
             }
